@@ -1,4 +1,4 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="de">
 <head>
   <meta charset="utf-8">
@@ -136,18 +136,76 @@
       display: grid;
       grid-template-columns: minmax(0, 1fr) max-content;
       position: relative;
+      width: 100%;
     }
 
     .unit-input input {
       min-width: 0;
-      padding-right: 32px;
+      padding-right: 11px;
+      font-variant-numeric: tabular-nums;
+    }
+
+    /* Native Zahlenpfeile werden je nach Browser erst bei Hover eingeblendet
+       und können Inhalte überdecken. Eigene, getrennte Schaltflächen sind
+       browserunabhängig und lassen Wert sowie Einheit vollständig lesbar. */
+    input[type="number"] {
+      appearance: textfield;
+      -moz-appearance: textfield;
+    }
+
+    input[type="number"]::-webkit-inner-spin-button,
+    input[type="number"]::-webkit-outer-spin-button {
+      margin: 0;
+      -webkit-appearance: none;
+    }
+
+    .unit-input.enhanced {
+      grid-template-columns: minmax(112px, 1fr) 38px minmax(62px, max-content);
+    }
+
+    .number-stepper {
+      display: grid;
+      grid-template-rows: 1fr 1fr;
+      min-width: 38px;
+      min-height: 43px;
+    }
+
+    .stepper-button {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 38px;
+      min-height: 0;
+      padding: 0;
+      color: var(--blue-950);
+      background: var(--blue-050);
+      border: 1px solid var(--gray-300);
+      border-left: 0;
+      border-radius: 0;
+      font-size: .68rem;
+      font-weight: 900;
+      line-height: 1;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .stepper-button:first-child { border-bottom: 0; }
+    .stepper-button:hover:not(:disabled) { color: var(--white); background: var(--blue-700); }
+    .stepper-button:active:not(:disabled) { background: var(--blue-950); }
+    .stepper-button:disabled { color: var(--gray-500); background: #e5eaed; cursor: not-allowed; }
+
+    .stepper-button:focus-visible {
+      position: relative;
+      z-index: 2;
+      outline: 3px solid rgba(30, 103, 152, .25);
+      outline-offset: -2px;
     }
 
     .unit {
       display: flex;
       align-items: center;
       justify-content: center;
-      min-width: 50px;
+      min-width: 62px;
       padding: 0 10px;
       color: var(--gray-650);
       background: var(--gray-100);
@@ -176,7 +234,7 @@
 
     .unit-input > input { border-radius: 8px 0 0 8px; }
     .unit-input > input:focus { position: relative; z-index: 1; }
-    .unit-input > input:disabled + .unit { color: var(--gray-500); background: #e5eaed; }
+    .unit-input > input:disabled ~ .unit { color: var(--gray-500); background: #e5eaed; }
 
     textarea { min-height: 72px; resize: vertical; }
     input:disabled { color: var(--gray-500); background: var(--gray-100); }
@@ -193,6 +251,8 @@
 
     .state-input.room { border-left-color: #c57a12; }
     .state-input.supply { border-left-color: #2e7d52; }
+    .state-input .form-grid,
+    details.advanced .form-grid:not(.one) { grid-template-columns: 1fr; }
 
     .state-input-header {
       display: flex;
@@ -329,6 +389,7 @@
     .chart-wrap {
       min-height: 410px;
       padding: 12px;
+      overflow-x: auto;
       background: var(--white);
       border: 1px solid var(--gray-200);
       border-radius: 10px;
@@ -347,6 +408,7 @@
     }
 
     .chart-explanation strong { display: block; margin-bottom: 3px; }
+    .chart-explanation .measured-value { font-weight: 800; }
     .chart-note { margin: 8px 0 0; color: var(--gray-650); font-size: .85rem; }
 
     .process-box {
@@ -410,7 +472,7 @@
       .report-head { flex-direction: column; }
       .report-meta { text-align: left; }
       .chart-wrap { min-height: 330px; padding: 4px; }
-      #humidityChart { min-height: 310px; }
+      #humidityChart { min-width: 760px; min-height: 0; }
     }
 
     @page { size: A4 portrait; margin: 10mm; }
@@ -432,7 +494,7 @@
       .state-card header { padding: 6px 8px; }
       .section-title { margin-top: 12px; padding-top: 8px; font-size: 12pt; break-after: avoid; }
       .chart-wrap { min-height: 0; padding: 2px; break-inside: avoid; }
-      #humidityChart { min-height: 0; height: auto; }
+      #humidityChart { min-width: 0; min-height: 0; width: 100%; height: auto; }
       .chart-explanation { padding: 7px 9px; font-size: 8pt; break-inside: avoid; }
       .chart-note { font-size: 7.5pt; }
       .comparison-table, .curve-table { font-size: 7.7pt; }
@@ -498,7 +560,7 @@
         <div class="state-input supply">
           <div class="state-input-header">
             <h3>Zuluft</h3>
-            <label class="toggle-label" for="useSupply"><input id="useSupply" type="checkbox"> Werte vorhanden</label>
+            <label class="toggle-label"><input id="useSupply" type="checkbox"> Werte vorhanden</label>
           </div>
           <div class="form-grid">
             <div class="field">
@@ -529,7 +591,7 @@
         <div class="state-input room">
           <div class="state-input-header">
             <h3>Kälteste Oberfläche</h3>
-            <label class="toggle-label" for="useSurface"><input id="useSurface" type="checkbox"> gemessen</label>
+            <label class="toggle-label"><input id="useSurface" type="checkbox"> gemessen</label>
           </div>
           <div class="field">
             <label for="surfaceTemp">Oberflächentemperatur</label>
@@ -563,7 +625,7 @@
               <div class="form-grid">
                 <div class="field">
                   <label for="pressure">Luftdruck</label>
-                  <div class="unit-input"><input id="pressure" type="number" min="800" max="1100" step="0.1" inputmode="decimal" value="1013.25"><span class="unit">hPa</span></div>
+                  <div class="unit-input"><input id="pressure" type="number" min="800" max="1100" step="0.01" inputmode="decimal" value="1013.25"><span class="unit">hPa</span></div>
                 </div>
                 <div class="field">
                   <label for="chartRange">Grafik ±</label>
@@ -618,13 +680,13 @@
 
           <h2 class="section-title print-break-before">Temperatur-Feuchte-Verlauf</h2>
           <div class="chart-explanation">
-            <strong>Wichtig zur Außenluftlinie</strong>
-            Sie zeigt nicht, dass sich die tatsächlich gemessene Außenluftfeuchte mit der Raumtemperatur verändert. Dargestellt wird, welche relative Feuchte derselbe eingegebene Außenluftzustand bei einer rein rechnerischen Temperaturänderung ohne Feuchtezufuhr oder Feuchteabfuhr hätte.
+            <strong>Außenluft: Messwert und Vergleichskurve sind zwei verschiedene Darstellungen</strong>
+            <span id="outdoorCurveExplanation"></span>
           </div>
           <div class="chart-wrap">
             <svg id="humidityChart" viewBox="0 0 920 520" role="img" aria-label="Rechnerischer Verlauf der relativen Feuchte bei Temperaturänderung ohne Änderung des Feuchtegehalts"></svg>
           </div>
-          <p class="chart-note">Die Temperaturachse ist keine Zeitachse. Jede Kurve betrachtet ihren Luftzustand getrennt. Bei der rechnerischen Temperierung bleiben Wasserdampf-Partialdruck, Feuchtegehalt x und Taupunkt bis zur Sättigung unverändert. Am Taupunkt werden 100 % r. F. erreicht; bei weiterer Abkühlung muss Feuchtigkeit kondensieren.</p>
+          <p class="chart-note">Die Temperaturachse ist keine Zeitachse. Die gestrichelten Kurven sind hypothetische Vergleichskurven und keine Messwertverläufe. Jeder Luftzustand wird getrennt betrachtet. Bei der rechnerischen Temperierung bleiben Wasserdampf-Partialdruck, Feuchtegehalt x und Tau-/Frostpunkt bis zur Sättigung unverändert. Am Tau- bzw. Frostpunkt werden 100 % r. F. erreicht; bei weiterer Abkühlung muss Wasser ausfallen.</p>
 
           <h2 class="section-title">Wertetabelle zur Grafik</h2>
           <div class="table-scroll"><table class="curve-table" id="curveTable"></table></div>
@@ -655,7 +717,7 @@
         <li><strong>Relative Feuchte:</strong> temperaturabhängiger Sättigungsgrad der Luft.</li>
         <li><strong>Feuchtegehalt x:</strong> Wasserdampfmasse je Kilogramm trockener Luft; besonders geeignet zum Vergleich von Außen-, Zu- und Raumluft.</li>
         <li><strong>Wasserdampfgehalt:</strong> Wasserdampfmasse je Kubikmeter feuchter Luft.</li>
-        <li><strong>Taupunkt:</strong> Temperatur, bei der 100 % r. F. erreicht werden. Kältere Oberflächen sind kondensationsgefährdet.</li>
+        <li><strong>Tau-/Frostpunkt:</strong> Temperatur, bei der 100 % r. F. erreicht werden. Oberhalb 0 °C ist bei weiterer Abkühlung Kondensat, unterhalb 0 °C Reif bzw. Eis möglich.</li>
         <li><strong>Enthalpie:</strong> spezifischer Energieinhalt der feuchten Luft, bezogen auf ein Kilogramm trockene Luft.</li>
       </ul>
 
@@ -669,10 +731,10 @@
       <p>Außen-, Zu- und Raumwerte sollen möglichst zeitgleich und mit vergleichbaren Messgeräten erfasst werden. Die eingestellten Messunsicherheiten werden beim Vergleich der Feuchtegehalte berücksichtigt. GLT-Werte können durch Fühlerposition, zeitliche Mittelung, verzögerte Aktualisierung oder nicht kalibrierte Sensoren abweichen.</p>
 
       <h3>Temperatur-Feuchte-Grafik</h3>
-      <p>Die Grafik ist keine zeitliche Prognose und koppelt die Außenluft nicht an die Raumtemperatur. Jede Linie zeigt für den jeweiligen eingegebenen Luftzustand, wie sich dessen relative Feuchte bei einer rein rechnerischen Temperaturänderung ohne Feuchtezufuhr oder Feuchteabfuhr verändern würde. Die tatsächliche Außenluft bleibt bei unveränderten Außenbedingungen unverändert.</p>
+      <p>Die Grafik ist keine zeitliche Prognose und koppelt die Außenluft nicht an die Raumtemperatur. Die farbigen Punkte kennzeichnen die eingegebenen Messzustände, sofern deren Temperatur im dargestellten Bereich liegt. Die gestrichelten Linien sind ausschließlich hypothetische Vergleichskurven: Sie zeigen für jeden Luftzustand getrennt, wie sich dessen relative Feuchte bei einer reinen Temperaturänderung ohne Feuchtezufuhr oder Feuchteabfuhr verändern würde. Die tatsächliche Außenluft bleibt bei unveränderten Außenbedingungen unverändert.</p>
 
       <h3>Berechnungsgrundlage und Grenzen</h3>
-      <p>Verwendet werden die Buck-Gleichungen für den Sättigungsdampfdruck über Wasser bzw. Eis sowie übliche psychrometrische Beziehungen für Feuchtegehalt und Enthalpie. Der Luftdruck beeinflusst Feuchtegehalt und Enthalpie, nicht jedoch den aus Temperatur und relativer Feuchte bestimmten Taupunkt. Nicht berücksichtigt werden unter anderem räumliche Feuchteverteilungen, dynamische Speicherwirkungen, Wärmebrücken, reale Kühlerkennlinien, Bypass-/Kontaktfaktoren und nicht zeitgleiche Messwerte.</p>
+      <p>Verwendet werden die Buck-Gleichungen für den Sättigungsdampfdruck über Wasser bzw. Eis sowie übliche psychrometrische Beziehungen für Feuchtegehalt und Enthalpie. Unterhalb 0 °C wird der Frostpunkt über Eis ausgewiesen. Der Luftdruck beeinflusst Feuchtegehalt und Enthalpie, nicht jedoch den aus Temperatur und relativer Feuchte bestimmten Tau-/Frostpunkt. Nicht berücksichtigt werden unter anderem räumliche Feuchteverteilungen, dynamische Speicherwirkungen, Wärmebrücken, reale Kühlerkennlinien, Bypass-/Kontaktfaktoren und nicht zeitgleiche Messwerte.</p>
 
       <p><strong>Version 1.1 · Stand 06.08.2026</strong></p>
     </div>
@@ -681,7 +743,7 @@
   <script>
     "use strict";
 
-    const APP_VERSION = "1.1";
+    const APP_VERSION = "1.2";
     const APP_DATE = "06.08.2026";
     const STORAGE_KEY = "raumluft-analyse-v1";
 
@@ -716,6 +778,7 @@
       comparisonTable: $("comparisonTable"),
       processBox: $("processBox"),
       humidityChart: $("humidityChart"),
+      outdoorCurveExplanation: $("outdoorCurveExplanation"),
       curveTable: $("curveTable"),
       checkList: $("checkList"),
       methodNote: $("methodNote"),
@@ -742,7 +805,62 @@
     };
 
     function numberFromInput(input) {
-      return Number(String(input.value).replace(",", "."));
+      const rawValue = String(input.value).trim();
+      if (rawValue === "") return Number.NaN;
+      return Number(rawValue.replace(",", "."));
+    }
+
+    function todayLocalIso() {
+      const today = new Date();
+      const year = today.getFullYear();
+      const month = String(today.getMonth() + 1).padStart(2, "0");
+      const day = String(today.getDate()).padStart(2, "0");
+      return `${year}-${month}-${day}`;
+    }
+
+    function enhanceNumberInputs() {
+      document.querySelectorAll(".unit-input > input[type='number']").forEach((input) => {
+        const container = input.parentElement;
+        if (container.classList.contains("enhanced")) return;
+
+        const controls = document.createElement("span");
+        controls.className = "number-stepper";
+
+        const fieldLabel = document.querySelector(`label[for="${input.id}"]`)?.textContent?.trim() || "Wert";
+        const stateLabel = input.closest(".state-input")?.querySelector("h3")?.textContent?.trim();
+        const label = stateLabel ? `${stateLabel} – ${fieldLabel}` : fieldLabel;
+        const buttons = [
+          { direction: 1, symbol: "▲", action: "erhöhen" },
+          { direction: -1, symbol: "▼", action: "verringern" }
+        ];
+
+        buttons.forEach(({ direction, symbol, action }) => {
+          const button = document.createElement("button");
+          button.type = "button";
+          button.className = "stepper-button";
+          button.textContent = symbol;
+          button.setAttribute("aria-label", `${label} ${action}`);
+          button.title = `${label} ${action}`;
+          button.disabled = input.disabled;
+          button.addEventListener("click", () => {
+            if (input.disabled) return;
+            try {
+              if (direction > 0) input.stepUp();
+              else input.stepDown();
+            } catch (_) {
+              const step = Number(input.step) || 1;
+              const current = numberFromInput(input);
+              input.value = String((Number.isFinite(current) ? current : 0) + direction * step);
+            }
+            input.dispatchEvent(new Event("change", { bubbles: true }));
+            input.focus({ preventScroll: true });
+          });
+          controls.appendChild(button);
+        });
+
+        container.classList.add("enhanced");
+        input.insertAdjacentElement("afterend", controls);
+      });
     }
 
     function clamp(value, min, max) {
@@ -760,6 +878,10 @@
     function signed(value, digits = 1) {
       const prefix = value > 0 ? "+" : "";
       return prefix + format(value, digits);
+    }
+
+    function pointName(state) {
+      return state.dewPoint < 0 ? "Frostpunkt" : "Taupunkt";
     }
 
     function escapeHtml(value) {
@@ -930,23 +1052,25 @@
 
     function condensationStatus(analysis) {
       const { data, room, surfaceReserve } = analysis;
+      const point = pointName(room);
+      const deposit = room.dewPoint < 0 ? "Reif bzw. Eis" : "Kondensat";
       if (!data.useSurface) {
         return {
           className: room.rh > 70 ? "warn" : "info",
-          value: `Taupunkt ${format(room.dewPoint)} °C`,
-          text: `Oberflächen mit ${format(room.dewPoint)} °C oder weniger sind kondensationsgefährdet. Oberflächentemperatur nicht gemessen.`
+          value: `${point} ${format(room.dewPoint)} °C`,
+          text: `Oberflächen mit ${format(room.dewPoint)} °C oder weniger sind durch ${deposit} gefährdet. Oberflächentemperatur nicht gemessen.`
         };
       }
       if (surfaceReserve <= 0) {
-        return { className: "critical", value: "Taupunkt unterschritten", text: `Oberfläche ${format(data.surfaceTemp)} °C; ${format(Math.abs(surfaceReserve))} K unter bzw. am Taupunkt. Kondensat ist zu erwarten.` };
+        return { className: "critical", value: `${point} unterschritten`, text: `Oberfläche ${format(data.surfaceTemp)} °C; ${format(Math.abs(surfaceReserve))} K unter bzw. am ${point}. ${deposit} ist zu erwarten.` };
       }
       if (surfaceReserve <= 1) {
-        return { className: "bad", value: `Nur ${format(surfaceReserve)} K Reserve`, text: "Sehr geringe Taupunktreserve. Messunsicherheit und lokale Kältepunkte berücksichtigen." };
+        return { className: "bad", value: `Nur ${format(surfaceReserve)} K Reserve`, text: `Sehr geringe ${point}reserve. Messunsicherheit und lokale Kältepunkte berücksichtigen.` };
       }
       if (surfaceReserve <= 3) {
-        return { className: "warn", value: `${format(surfaceReserve)} K Reserve`, text: "Geringe Taupunktreserve. Kalte Oberflächen und zeitlichen Verlauf beobachten." };
+        return { className: "warn", value: `${format(surfaceReserve)} K Reserve`, text: `Geringe ${point}reserve. Kalte Oberflächen und zeitlichen Verlauf beobachten.` };
       }
-      return { className: "good", value: `${format(surfaceReserve)} K Reserve`, text: `Die gemessene Oberfläche liegt ausreichend über dem berechneten Raumtaupunkt von ${format(room.dewPoint)} °C.` };
+      return { className: "good", value: `${format(surfaceReserve)} K Reserve`, text: `Die gemessene Oberfläche liegt ausreichend über dem berechneten ${point} der Raumluft von ${format(room.dewPoint)} °C.` };
     }
 
     function plausibilityStatus(analysis) {
@@ -965,7 +1089,7 @@
         return { className: "good", value: "Feuchteänderung nicht eindeutig", text: "Außen- und Zuluft-Feuchtegehalt liegen innerhalb der eingestellten Messunsicherheit. Ein sensibler Kühlprozess ist möglich." };
       }
       if (deltaXSupplyOutdoor < 0) {
-        return { className: "good", value: "Feuchteabscheidung erkennbar", text: `Die Zuluft ist um ${format(Math.abs(deltaXSupplyOutdoor))} g/kg trockener als die Außenluft. Das ist mit Kondensatanfall bzw. Entfeuchtung vereinbar.` };
+        return { className: "good", value: "Zuluft trockener als Außenluft", text: `Die Zuluft ist um ${format(Math.abs(deltaXSupplyOutdoor))} g/kg trockener als die Außenluft. Mögliche Ursachen sind Kondensatanfall, geregelte Entfeuchtung oder trockenere Umluft/Mischluft; den Anlagenprozess vor Ort prüfen.` };
       }
       return { className: "warn", value: "Zuluft feuchter als Außenluft", text: `Die Zuluft enthält ${format(deltaXSupplyOutdoor)} g/kg mehr Feuchte. Messzeitpunkt, Sensoren, Mischluft und mögliche Feuchtequellen prüfen.` };
     }
@@ -973,7 +1097,7 @@
     function renderStatusCards(analysis) {
       const cards = [
         { label: "Raumzustand", title: "Temperatur und Feuchte", ...roomStatus(analysis) },
-        { label: "Kondensationsrisiko", title: "Taupunkt / Oberfläche", ...condensationStatus(analysis) },
+        { label: "Kondensations-/Frostrisiko", title: "Tau-/Frostpunkt / Oberfläche", ...condensationStatus(analysis) },
         { label: "Prozessplausibilität", title: "Außenluft → Zuluft → Raum", ...plausibilityStatus(analysis) }
       ];
       elements.statusGrid.innerHTML = cards.map((card) => `
@@ -989,7 +1113,7 @@
     function buildSummary(analysis) {
       const { outdoor, supply, room, data, deltaXRoomOutdoor, uncertaintyRoomOutdoor, outdoorRhAtRoomTempRaw } = analysis;
       const parts = [];
-      parts.push(`<strong>Raumluft:</strong> ${format(room.temp)} °C / ${format(room.rh)} % r. F.; daraus ergeben sich ${format(room.dewPoint)} °C Taupunkt und ${format(room.humidityRatio)} g/kg Feuchtegehalt.`);
+      parts.push(`<strong>Raumluft:</strong> ${format(room.temp)} °C / ${format(room.rh)} % r. F.; daraus ergeben sich ${format(room.dewPoint)} °C ${pointName(room)} und ${format(room.humidityRatio)} g/kg Feuchtegehalt.`);
 
       if (outdoorRhAtRoomTempRaw >= 100) {
         parts.push(`Würde der Außenluftzustand ohne Feuchteänderung auf ${format(room.temp)} °C abgekühlt, würde bereits bei ${format(outdoor.dewPoint)} °C Sättigung erreicht; weitere Abkühlung erfordert Kondensation.`);
@@ -1024,7 +1148,7 @@
           <dl>
             <dt>Temperatur</dt><dd>${format(state.temp)} °C</dd>
             <dt>Relative Feuchte</dt><dd>${format(state.rh)} %</dd>
-            <dt>Taupunkt</dt><dd>${format(state.dewPoint)} °C</dd>
+            <dt>${pointName(state)}</dt><dd>${format(state.dewPoint)} °C</dd>
             <dt>Feuchtegehalt x</dt><dd>${format(state.humidityRatio, 2)} g/kg</dd>
             <dt>Wasserdampfgehalt</dt><dd>${format(state.absoluteHumidity, 2)} g/m³</dd>
             <dt>Enthalpie</dt><dd>${format(state.enthalpy, 2)} kJ/kg</dd>
@@ -1058,7 +1182,7 @@
         <tbody>
           ${row("Temperatur", (s) => `${format(s.temp)} °C`)}
           ${row("Relative Feuchte", (s) => `${format(s.rh)} %`)}
-          ${row("Taupunkt", (s) => `${format(s.dewPoint)} °C`)}
+          ${row("Tau-/Frostpunkt", (s) => `${format(s.dewPoint)} °C (${s.dewPoint < 0 ? "FP" : "TP"})`)}
           ${row("Feuchtegehalt x", (s) => `${format(s.humidityRatio, 2)} g/kg`)}
           ${row("Abgeschätzte x-Unsicherheit", uncertaintyText)}
           ${row("Enthalpie", (s) => `${format(s.enthalpy, 2)} kJ/kg`)}
@@ -1068,9 +1192,9 @@
     function plantConfigText(config) {
       const texts = {
         coolingCoil: "Kühlregister ohne geregelte Entfeuchtung: Kondensatanfall ist möglich, wenn die Kühleroberfläche den Taupunkt unterschreitet. Ohne Nacherwärmung kann die Zuluft eine hohe relative Feuchte aufweisen.",
-        sensibleOnly: "Nur sensible Kühlung angenommen: Der Feuchtegehalt x muss zwischen Außen- und Zuluft innerhalb der Messunsicherheit annähernd gleich bleiben.",
-        dehumidification: "Geregelte Entfeuchtung: Ein niedrigerer Zuluft-Feuchtegehalt ist erwartbar. Eine mögliche Nacherwärmung verändert die relative Feuchte, nicht den Feuchtegehalt.",
-        ventilationOnly: "Lüftung ohne Kühlung oder Entfeuchtung: Bei reiner Temperaturänderung bzw. Erwärmung bleibt der Feuchtegehalt näherungsweise konstant.",
+        sensibleOnly: "Nur sensible Kühlung angenommen: Bei reiner Außenluftführung muss der Feuchtegehalt x zwischen Eintritt und Zuluft innerhalb der Messunsicherheit annähernd gleich bleiben. Bei Umluft/Mischluft ist der direkte Vergleich mit der Außenluft allein nicht ausreichend.",
+        dehumidification: "Geregelte Entfeuchtung: Gegenüber dem Lufteintritt in den Kühler ist ein niedrigerer Zuluft-Feuchtegehalt erwartbar. Eine mögliche Nacherwärmung verändert die relative Feuchte, nicht den Feuchtegehalt. Umluft/Mischluft beim Vergleich berücksichtigen.",
+        ventilationOnly: "Lüftung ohne Kühlung oder Entfeuchtung: Bei reiner Temperaturänderung bleibt der Feuchtegehalt näherungsweise konstant. Bei Umluft/Mischluft kann der Zuluftzustand nicht unmittelbar mit der Außenluft gleichgesetzt werden.",
         unknown: "Anlagenfunktion unbekannt: Es erfolgt nur ein Messwertvergleich; eine abschließende Prozessbewertung ist nicht möglich."
       };
       return texts[config];
@@ -1115,7 +1239,7 @@
         const dx = Math.abs(supply.humidityRatio - outdoor.humidityRatio);
         const uncertainty = Math.hypot(supply.uncertaintyX, outdoor.uncertaintyX);
         if (dx > uncertainty) {
-          elements.processBox.innerHTML += `<div class="process-step" style="border-color:#d39a9a;background:#fdecec"><strong>Konfiguration prüfen</strong><span>Die Messwerte zeigen eine Feuchteänderung außerhalb der Unsicherheit, obwohl „nur sensible Kühlung“ gewählt wurde.</span></div>`;
+          elements.processBox.innerHTML += `<div class="process-step" style="border-color:#d39a9a;background:#fdecec"><strong>Konfiguration und Luftführung prüfen</strong><span>Außen- und Zuluft unterscheiden sich außerhalb der Messunsicherheit. Bei reiner Außenluftführung passt dies nicht zu ausschließlich sensibler Kühlung; bei Umluft/Mischluft ist der direkte Vergleich dagegen nicht beweiskräftig.</span></div>`;
         }
       }
     }
@@ -1160,20 +1284,21 @@
       svg.appendChild(svgElement("text", { x: margin.left + plotW / 2, y: height - 16, "text-anchor": "middle", fill: "#3b454d", "font-size": 14, "font-weight": 700 }, "Temperatur [°C]"));
       const yTitle = svgElement("text", { x: 18, y: margin.top + plotH / 2, "text-anchor": "middle", fill: "#3b454d", "font-size": 14, "font-weight": 700, transform: `rotate(-90 18 ${margin.top + plotH / 2})` }, "Relative Feuchte [%]");
       svg.appendChild(yTitle);
-      svg.appendChild(svgElement("text", { x: margin.left, y: 26, fill: "#12364f", "font-size": 18, "font-weight": 800 }, "Relative Feuchte bei rechnerischer Temperierung"));
-      svg.appendChild(svgElement("text", { x: margin.left, y: 47, fill: "#5b6872", "font-size": 12 }, "Jeder Luftzustand wird getrennt betrachtet – ohne Feuchtezufuhr oder Feuchteabfuhr"));
+      svg.appendChild(svgElement("text", { x: margin.left, y: 26, fill: "#12364f", "font-size": 18, "font-weight": 800 }, "Hypothetische Temperaturänderung bei gleichem Feuchtegehalt"));
+      svg.appendChild(svgElement("text", { x: margin.left, y: 47, fill: "#5b6872", "font-size": 12 }, "Gestrichelte Kurven = rechnerischer Vergleich, keine zeitliche Messwertentwicklung"));
 
       const states = [
-        { key: "outdoor", name: "Außenluft – rechnerisch temperiert", state: analysis.outdoor },
-        ...(analysis.supply ? [{ key: "supply", name: "Zuluft – rechnerisch temperiert", state: analysis.supply }] : []),
-        { key: "room", name: "Raumluft – rechnerisch temperiert", state: analysis.room }
+        { key: "outdoor", name: "Außenluft-Vergleich (hypothetisch)", state: analysis.outdoor },
+        ...(analysis.supply ? [{ key: "supply", name: "Zuluft-Vergleich (hypothetisch)", state: analysis.supply }] : []),
+        { key: "room", name: "Raumluft-Vergleich (hypothetisch)", state: analysis.room }
       ];
 
       const legendWidth = plotW / states.length;
       states.forEach((item, index) => {
         const color = stateColors[item.key];
         const legendX = margin.left + index * legendWidth;
-        svg.appendChild(svgElement("line", { x1: legendX, y1: 78, x2: legendX + 25, y2: 78, stroke: color, "stroke-width": 4 }));
+        svg.appendChild(svgElement("line", { x1: legendX, y1: 78, x2: legendX + 25, y2: 78, stroke: color, "stroke-width": 3, "stroke-dasharray": "7 4" }));
+        svg.appendChild(svgElement("circle", { cx: legendX + 12.5, cy: 78, r: 4, fill: color, stroke: "#fff", "stroke-width": 1.5 }));
         svg.appendChild(svgElement("text", { x: legendX + 32, y: 82, fill: "#3b454d", "font-size": analysis.supply ? 11 : 12, "font-weight": 700 }, item.name));
 
         const points = [];
@@ -1184,13 +1309,13 @@
           const plottedRh = clamp(rawRh, 0, 100);
           points.push(`${xScale(temp).toFixed(2)},${yScale(plottedRh).toFixed(2)}`);
         }
-        svg.appendChild(svgElement("polyline", { points: points.join(" "), fill: "none", stroke: color, "stroke-width": 3, "stroke-linejoin": "round", "stroke-linecap": "round" }));
+        svg.appendChild(svgElement("polyline", { points: points.join(" "), fill: "none", stroke: color, "stroke-width": 3, "stroke-dasharray": "8 5", "stroke-linejoin": "round", "stroke-linecap": "round" }));
 
         if (item.state.dewPoint >= minT && item.state.dewPoint <= maxT) {
           const dewX = xScale(item.state.dewPoint);
           svg.appendChild(svgElement("circle", { cx: dewX, cy: yScale(100), r: 5, fill: color, stroke: "#fff", "stroke-width": 2 }));
           svg.appendChild(svgElement("line", { x1: dewX, y1: yScale(100), x2: dewX, y2: yScale(92), stroke: color, "stroke-width": 1.5, "stroke-dasharray": "4 3" }));
-          svg.appendChild(svgElement("text", { x: dewX, y: yScale(88), "text-anchor": "middle", fill: color, "font-size": 11, "font-weight": 700 }, `TP ${format(item.state.dewPoint)}°`));
+          svg.appendChild(svgElement("text", { x: dewX, y: yScale(88), "text-anchor": "middle", fill: color, "font-size": 11, "font-weight": 700 }, `${item.state.dewPoint < 0 ? "FP" : "TP"} ${format(item.state.dewPoint)}°`));
         }
 
         if (item.state.temp >= minT && item.state.temp <= maxT) {
@@ -1205,23 +1330,23 @@
 
     function stateAtTemperature(state, temp) {
       const rawRh = relativeHumidityAtTemp(state.vaporPressure, temp);
-      if (rawRh >= 100) return { rh: 100, condensed: true };
-      return { rh: rawRh, condensed: false };
+      if (rawRh >= 100) return { rh: 100, saturated: true, phase: temp < 0 ? "Reif/Eis" : "Kondensation" };
+      return { rh: rawRh, saturated: false, phase: "" };
     }
 
     function renderCurveTable(analysis) {
       const minT = analysis.room.temp - analysis.data.chartRange;
       const maxT = analysis.room.temp + analysis.data.chartRange;
       const states = [
-        { title: "Außenluft rechnerisch temperiert – r. F.", state: analysis.outdoor },
-        ...(analysis.supply ? [{ title: "Zuluft rechnerisch temperiert – r. F.", state: analysis.supply }] : []),
-        { title: "Raumluft rechnerisch temperiert – r. F.", state: analysis.room }
+        { title: "Außenluft-Vergleich (hypothetisch) – r. F.", state: analysis.outdoor },
+        ...(analysis.supply ? [{ title: "Zuluft-Vergleich (hypothetisch) – r. F.", state: analysis.supply }] : []),
+        { title: "Raumluft-Vergleich (hypothetisch) – r. F.", state: analysis.room }
       ];
       const rows = [];
       for (let temp = Math.ceil(minT); temp <= Math.floor(maxT); temp += 1) {
         const values = states.map((item) => {
           const result = stateAtTemperature(item.state, temp);
-          return `<td>${format(result.rh)} %${result.condensed ? " · Kondensation" : ""}</td>`;
+          return `<td>${format(result.rh)} %${result.saturated ? ` · ${result.phase}` : ""}</td>`;
         }).join("");
         rows.push(`<tr><td>${format(temp, 0)} °C</td>${values}</tr>`);
       }
@@ -1261,6 +1386,17 @@
       elements.reportMeta.innerHTML = `${escapeHtml(date)}<br>${escapeHtml(operator)}<br>Version ${APP_VERSION}`;
     }
 
+    function renderChartExplanation(analysis) {
+      const outdoor = analysis.outdoor;
+      const minT = analysis.room.temp - analysis.data.chartRange;
+      const maxT = analysis.room.temp + analysis.data.chartRange;
+      const pointVisible = outdoor.temp >= minT && outdoor.temp <= maxT;
+      const pointNote = pointVisible
+        ? "Der blaue Punkt markiert diesen Messzustand."
+        : "Seine Temperatur liegt außerhalb des gewählten Grafikbereichs; deshalb ist der blaue Messpunkt dort nicht sichtbar.";
+      elements.outdoorCurveExplanation.innerHTML = `<span class="measured-value">Eingegebener Außenluftzustand: ${format(outdoor.temp)} °C / ${format(outdoor.rh)} % r. F.</span> ${pointNote} Die gestrichelte blaue Kurve ist nur ein rechnerischer Vergleich: Sie zeigt denselben Außenluft-Feuchtegehalt bei anderen angenommenen Temperaturen. Sie ist weder ein zeitlicher Außenluftverlauf noch eine Folge der Raumtemperatur.`;
+    }
+
     function renderMethodNote(analysis) {
       elements.methodNote.innerHTML = `<strong>Anlagenannahme:</strong> ${plantConfigText(analysis.data.plantConfig)}<br><strong>Berechnung:</strong> Sättigungsdampfdruck nach Buck über Wasser/Eis; Feuchtegehalt und Enthalpie bezogen auf trockene Luft; Luftdruck ${format(analysis.data.pressure, 1)} hPa. Messunsicherheiten T ±${format(analysis.data.tempTolerance)} K / r. F. ±${format(analysis.data.rhTolerance)} %. Die Bewertung ist eine fachliche Orientierung und ersetzt keine zeitgleichen Referenzmessungen oder anlagenspezifischen Sollvorgaben. Stand ${APP_DATE}.`;
     }
@@ -1296,7 +1432,7 @@
           else element.value = saved[id];
         });
       } else if (!elements.measurementDate.value) {
-        elements.measurementDate.value = new Date().toISOString().slice(0, 10);
+        elements.measurementDate.value = todayLocalIso();
       }
       syncOptionalInputs();
     }
@@ -1305,6 +1441,11 @@
       elements.supplyTemp.disabled = !elements.useSupply.checked;
       elements.supplyRh.disabled = !elements.useSupply.checked;
       elements.surfaceTemp.disabled = !elements.useSurface.checked;
+      [elements.supplyTemp, elements.supplyRh, elements.surfaceTemp].forEach((input) => {
+        input.parentElement.querySelectorAll(".stepper-button").forEach((button) => {
+          button.disabled = input.disabled;
+        });
+      });
     }
 
     function calculateAndRender(options = {}) {
@@ -1319,6 +1460,7 @@
       renderStateCards(analysis);
       renderComparisonTable(analysis);
       processAssessment(analysis);
+      renderChartExplanation(analysis);
       renderChart(analysis);
       renderCurveTable(analysis);
       renderCheckList(analysis);
@@ -1333,7 +1475,7 @@
       if (!confirmed) return;
       try { localStorage.removeItem(STORAGE_KEY); } catch (_) { /* optional */ }
       elements.roomName.value = "";
-      elements.measurementDate.value = new Date().toISOString().slice(0, 10);
+      elements.measurementDate.value = todayLocalIso();
       elements.operatorName.value = "";
       elements.outdoorTemp.value = "30";
       elements.outdoorRh.value = "50";
@@ -1383,6 +1525,7 @@
       buildAnalysis
     };
 
+    enhanceNumberInputs();
     loadInputs();
     calculateAndRender();
   </script>
