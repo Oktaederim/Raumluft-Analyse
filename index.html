@@ -132,15 +132,31 @@
       font-weight: 700;
     }
 
-    .unit-input { position: relative; }
-    .unit-input input { padding-right: 54px; }
+    .unit-input {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) max-content;
+      position: relative;
+    }
+
+    .unit-input input {
+      min-width: 0;
+      padding-right: 32px;
+    }
+
     .unit {
-      position: absolute;
-      right: 11px;
-      top: 50%;
-      transform: translateY(-50%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 50px;
+      padding: 0 10px;
       color: var(--gray-650);
+      background: var(--gray-100);
+      border: 1px solid var(--gray-300);
+      border-left: 0;
+      border-radius: 0 8px 8px 0;
       font-size: .9rem;
+      font-weight: 650;
+      white-space: nowrap;
       pointer-events: none;
     }
 
@@ -157,6 +173,10 @@
       border: 1px solid var(--gray-300);
       border-radius: 8px;
     }
+
+    .unit-input > input { border-radius: 8px 0 0 8px; }
+    .unit-input > input:focus { position: relative; z-index: 1; }
+    .unit-input > input:disabled + .unit { color: var(--gray-500); background: #e5eaed; }
 
     textarea { min-height: 72px; resize: vertical; }
     input:disabled { color: var(--gray-500); background: var(--gray-100); }
@@ -315,6 +335,18 @@
     }
 
     #humidityChart { display: block; width: 100%; height: auto; min-height: 380px; }
+    .chart-explanation {
+      margin: 0 0 12px;
+      padding: 12px 14px;
+      color: var(--blue-950);
+      background: var(--blue-050);
+      border: 1px solid #bfd5e3;
+      border-left: 5px solid var(--blue-700);
+      border-radius: 8px;
+      font-size: .9rem;
+    }
+
+    .chart-explanation strong { display: block; margin-bottom: 3px; }
     .chart-note { margin: 8px 0 0; color: var(--gray-650); font-size: .85rem; }
 
     .process-box {
@@ -400,7 +432,8 @@
       .state-card header { padding: 6px 8px; }
       .section-title { margin-top: 12px; padding-top: 8px; font-size: 12pt; break-after: avoid; }
       .chart-wrap { min-height: 0; padding: 2px; break-inside: avoid; }
-      #humidityChart { min-height: 0; height: 91mm; }
+      #humidityChart { min-height: 0; height: auto; }
+      .chart-explanation { padding: 7px 9px; font-size: 8pt; break-inside: avoid; }
       .chart-note { font-size: 7.5pt; }
       .comparison-table, .curve-table { font-size: 7.7pt; }
       .comparison-table th, .comparison-table td, .curve-table th, .curve-table td { padding: 4px 5px; }
@@ -584,10 +617,14 @@
           <div class="process-box" id="processBox"></div>
 
           <h2 class="section-title print-break-before">Temperatur-Feuchte-Verlauf</h2>
-          <div class="chart-wrap">
-            <svg id="humidityChart" viewBox="0 0 920 480" role="img" aria-label="Verlauf der relativen Feuchte bei Temperaturänderung"></svg>
+          <div class="chart-explanation">
+            <strong>Wichtig zur Außenluftlinie</strong>
+            Sie zeigt nicht, dass sich die tatsächlich gemessene Außenluftfeuchte mit der Raumtemperatur verändert. Dargestellt wird, welche relative Feuchte derselbe eingegebene Außenluftzustand bei einer rein rechnerischen Temperaturänderung ohne Feuchtezufuhr oder Feuchteabfuhr hätte.
           </div>
-          <p class="chart-note">Die Kurven zeigen die relative Feuchte bei gleichbleibendem Wasserdampf-Partialdruck. Am Taupunkt werden 100 % r. F. erreicht. Unterhalb des Taupunkts ist dieser Zustand ohne Kondensation nicht möglich.</p>
+          <div class="chart-wrap">
+            <svg id="humidityChart" viewBox="0 0 920 520" role="img" aria-label="Rechnerischer Verlauf der relativen Feuchte bei Temperaturänderung ohne Änderung des Feuchtegehalts"></svg>
+          </div>
+          <p class="chart-note">Die Temperaturachse ist keine Zeitachse. Jede Kurve betrachtet ihren Luftzustand getrennt. Bei der rechnerischen Temperierung bleiben Wasserdampf-Partialdruck, Feuchtegehalt x und Taupunkt bis zur Sättigung unverändert. Am Taupunkt werden 100 % r. F. erreicht; bei weiterer Abkühlung muss Feuchtigkeit kondensieren.</p>
 
           <h2 class="section-title">Wertetabelle zur Grafik</h2>
           <div class="table-scroll"><table class="curve-table" id="curveTable"></table></div>
@@ -631,17 +668,20 @@
       <h3>Messunsicherheit und Vergleichbarkeit</h3>
       <p>Außen-, Zu- und Raumwerte sollen möglichst zeitgleich und mit vergleichbaren Messgeräten erfasst werden. Die eingestellten Messunsicherheiten werden beim Vergleich der Feuchtegehalte berücksichtigt. GLT-Werte können durch Fühlerposition, zeitliche Mittelung, verzögerte Aktualisierung oder nicht kalibrierte Sensoren abweichen.</p>
 
+      <h3>Temperatur-Feuchte-Grafik</h3>
+      <p>Die Grafik ist keine zeitliche Prognose und koppelt die Außenluft nicht an die Raumtemperatur. Jede Linie zeigt für den jeweiligen eingegebenen Luftzustand, wie sich dessen relative Feuchte bei einer rein rechnerischen Temperaturänderung ohne Feuchtezufuhr oder Feuchteabfuhr verändern würde. Die tatsächliche Außenluft bleibt bei unveränderten Außenbedingungen unverändert.</p>
+
       <h3>Berechnungsgrundlage und Grenzen</h3>
       <p>Verwendet werden die Buck-Gleichungen für den Sättigungsdampfdruck über Wasser bzw. Eis sowie übliche psychrometrische Beziehungen für Feuchtegehalt und Enthalpie. Der Luftdruck beeinflusst Feuchtegehalt und Enthalpie, nicht jedoch den aus Temperatur und relativer Feuchte bestimmten Taupunkt. Nicht berücksichtigt werden unter anderem räumliche Feuchteverteilungen, dynamische Speicherwirkungen, Wärmebrücken, reale Kühlerkennlinien, Bypass-/Kontaktfaktoren und nicht zeitgleiche Messwerte.</p>
 
-      <p><strong>Version 1.0 · Stand 06.08.2026</strong></p>
+      <p><strong>Version 1.1 · Stand 06.08.2026</strong></p>
     </div>
   </dialog>
 
   <script>
     "use strict";
 
-    const APP_VERSION = "1.0";
+    const APP_VERSION = "1.1";
     const APP_DATE = "06.08.2026";
     const STORAGE_KEY = "raumluft-analyse-v1";
 
@@ -1091,8 +1131,8 @@
       const svg = elements.humidityChart;
       svg.replaceChildren();
       const width = 920;
-      const height = 480;
-      const margin = { left: 70, right: 24, top: 60, bottom: 64 };
+      const height = 520;
+      const margin = { left: 70, right: 24, top: 108, bottom: 64 };
       const plotW = width - margin.left - margin.right;
       const plotH = height - margin.top - margin.bottom;
       const minT = analysis.room.temp - analysis.data.chartRange;
@@ -1120,21 +1160,21 @@
       svg.appendChild(svgElement("text", { x: margin.left + plotW / 2, y: height - 16, "text-anchor": "middle", fill: "#3b454d", "font-size": 14, "font-weight": 700 }, "Temperatur [°C]"));
       const yTitle = svgElement("text", { x: 18, y: margin.top + plotH / 2, "text-anchor": "middle", fill: "#3b454d", "font-size": 14, "font-weight": 700, transform: `rotate(-90 18 ${margin.top + plotH / 2})` }, "Relative Feuchte [%]");
       svg.appendChild(yTitle);
-      svg.appendChild(svgElement("text", { x: margin.left, y: 26, fill: "#12364f", "font-size": 18, "font-weight": 800 }, "Relative Feuchte bei Temperaturänderung"));
-      svg.appendChild(svgElement("text", { x: margin.left, y: 45, fill: "#5b6872", "font-size": 12 }, "Gleicher Wasserdampf-Partialdruck bis zum Taupunkt; darunter Kondensationsbereich"));
+      svg.appendChild(svgElement("text", { x: margin.left, y: 26, fill: "#12364f", "font-size": 18, "font-weight": 800 }, "Relative Feuchte bei rechnerischer Temperierung"));
+      svg.appendChild(svgElement("text", { x: margin.left, y: 47, fill: "#5b6872", "font-size": 12 }, "Jeder Luftzustand wird getrennt betrachtet – ohne Feuchtezufuhr oder Feuchteabfuhr"));
 
       const states = [
-        { key: "outdoor", name: "Außenluft", state: analysis.outdoor },
-        ...(analysis.supply ? [{ key: "supply", name: "Zuluft", state: analysis.supply }] : []),
-        { key: "room", name: "Raumluft", state: analysis.room }
+        { key: "outdoor", name: "Außenluft – rechnerisch temperiert", state: analysis.outdoor },
+        ...(analysis.supply ? [{ key: "supply", name: "Zuluft – rechnerisch temperiert", state: analysis.supply }] : []),
+        { key: "room", name: "Raumluft – rechnerisch temperiert", state: analysis.room }
       ];
 
-      const legendStart = width - margin.right - (analysis.supply ? 350 : 260);
+      const legendWidth = plotW / states.length;
       states.forEach((item, index) => {
         const color = stateColors[item.key];
-        const legendX = legendStart + index * (analysis.supply ? 118 : 130);
-        svg.appendChild(svgElement("line", { x1: legendX, y1: 27, x2: legendX + 25, y2: 27, stroke: color, "stroke-width": 4 }));
-        svg.appendChild(svgElement("text", { x: legendX + 32, y: 31, fill: "#3b454d", "font-size": 12, "font-weight": 700 }, item.name));
+        const legendX = margin.left + index * legendWidth;
+        svg.appendChild(svgElement("line", { x1: legendX, y1: 78, x2: legendX + 25, y2: 78, stroke: color, "stroke-width": 4 }));
+        svg.appendChild(svgElement("text", { x: legendX + 32, y: 82, fill: "#3b454d", "font-size": analysis.supply ? 11 : 12, "font-weight": 700 }, item.name));
 
         const points = [];
         const samples = 240;
@@ -1173,9 +1213,9 @@
       const minT = analysis.room.temp - analysis.data.chartRange;
       const maxT = analysis.room.temp + analysis.data.chartRange;
       const states = [
-        { title: "r. F. Außenluftzustand", state: analysis.outdoor },
-        ...(analysis.supply ? [{ title: "r. F. Zuluftzustand", state: analysis.supply }] : []),
-        { title: "r. F. Raumluftzustand", state: analysis.room }
+        { title: "Außenluft rechnerisch temperiert – r. F.", state: analysis.outdoor },
+        ...(analysis.supply ? [{ title: "Zuluft rechnerisch temperiert – r. F.", state: analysis.supply }] : []),
+        { title: "Raumluft rechnerisch temperiert – r. F.", state: analysis.room }
       ];
       const rows = [];
       for (let temp = Math.ceil(minT); temp <= Math.floor(maxT); temp += 1) {
