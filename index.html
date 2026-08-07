@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<!-- Raumluft-Analyse: vollständige Ein-Datei-Version 1.4 vom 07.08.2026 -->
 <html lang="de">
 <head>
   <meta charset="utf-8">
@@ -77,6 +78,20 @@
     .app-header h1 { margin: 0 0 5px; font-size: clamp(1.55rem, 2.3vw, 2.2rem); line-height: 1.15; }
     .app-header p { margin: 0; max-width: 850px; color: #dcebf4; }
     .header-actions { display: flex; gap: 10px; flex-wrap: wrap; justify-content: flex-end; }
+    .version-badge {
+      display: inline-flex;
+      align-items: center;
+      min-height: 30px;
+      margin-top: 11px;
+      padding: 4px 10px;
+      color: var(--blue-950);
+      background: #fff;
+      border: 1px solid rgba(255,255,255,.65);
+      border-radius: 999px;
+      font-size: .82rem;
+      font-weight: 850;
+      letter-spacing: .02em;
+    }
 
     .btn {
       min-height: 44px;
@@ -148,33 +163,25 @@
     /* Native Zahlenpfeile werden je nach Browser erst bei Hover eingeblendet
        und können Inhalte überdecken. Eigene, getrennte Schaltflächen sind
        browserunabhängig und lassen Wert sowie Einheit vollständig lesbar. */
-    input[type="number"] {
-      appearance: textfield;
-      -moz-appearance: textfield;
-    }
-
-    input[type="number"]::-webkit-inner-spin-button,
-    input[type="number"]::-webkit-outer-spin-button {
-      margin: 0;
-      -webkit-appearance: none;
-    }
-
     .unit-input.enhanced {
-      grid-template-columns: minmax(112px, 1fr) 38px minmax(62px, max-content);
+      grid-template-columns: minmax(96px, 1fr) 42px minmax(68px, max-content);
+      column-gap: 0;
     }
 
     .number-stepper {
       display: grid;
       grid-template-rows: 1fr 1fr;
-      min-width: 38px;
+      min-width: 42px;
       min-height: 43px;
+      position: relative;
+      z-index: 1;
     }
 
     .stepper-button {
       display: flex;
       align-items: center;
       justify-content: center;
-      min-width: 38px;
+      min-width: 42px;
       min-height: 0;
       padding: 0;
       color: var(--blue-950);
@@ -251,6 +258,7 @@
 
     .state-input.room { border-left-color: #c57a12; }
     .state-input.supply { border-left-color: #2e7d52; }
+    .state-input.chart-settings { border-left-color: var(--purple); background: #faf7fd; }
     .state-input .form-grid,
     details.advanced .form-grid:not(.one) { grid-template-columns: 1fr; }
 
@@ -383,6 +391,15 @@
     .curve-table thead th { color: var(--white); background: var(--blue-800); }
     .comparison-table tbody tr:nth-child(even),
     .curve-table tbody tr:nth-child(even) { background: var(--gray-050); }
+
+    .comparison-table .col-outdoor, .curve-table .col-outdoor { background: #eaf4fb; }
+    .comparison-table .col-room, .curve-table .col-room { background: #fff3e3; }
+    .comparison-table thead .col-outdoor, .curve-table thead .col-outdoor { color: var(--white); background: #24688f; }
+    .comparison-table thead .col-room, .curve-table thead .col-room { color: var(--white); background: #a96212; }
+    .comparison-table tbody tr:nth-child(even) .col-outdoor, .curve-table tbody tr:nth-child(even) .col-outdoor { background: #deedf7; }
+    .comparison-table tbody tr:nth-child(even) .col-room, .curve-table tbody tr:nth-child(even) .col-room { background: #fbe8cf; }
+    .curve-value { display: grid; gap: 2px; }
+    .curve-value small { color: var(--gray-650); font-size: .78em; white-space: nowrap; }
 
     .table-scroll { overflow-x: auto; }
 
@@ -517,6 +534,7 @@
       <div>
         <h1>Raumluft-Analyse</h1>
         <p>Plausibilitätsprüfung von Außenluft, Zuluft und Raumluft – mit automatisch berechnetem Taupunkt, Feuchtegehalt und Kondensationsbewertung.</p>
+        <span class="version-badge">Vollständige Version 1.4</span>
       </div>
       <div class="header-actions">
         <button class="btn btn-secondary" id="infoButton" type="button">ⓘ Info</button>
@@ -548,11 +566,11 @@
           <div class="form-grid">
             <div class="field">
               <label for="outdoorTemp">Temperatur</label>
-              <div class="unit-input"><input id="outdoorTemp" type="number" min="-50" max="70" step="0.1" inputmode="decimal" value="30"><span class="unit">°C</span></div>
+              <div class="unit-input"><input id="outdoorTemp" class="numeric-input" type="text" data-min="-50" data-max="70" data-step="0.1" inputmode="decimal" value="30"><span class="unit">°C</span></div>
             </div>
             <div class="field">
               <label for="outdoorRh">Relative Feuchte</label>
-              <div class="unit-input"><input id="outdoorRh" type="number" min="0.1" max="100" step="0.1" inputmode="decimal" value="50"><span class="unit">% r. F.</span></div>
+              <div class="unit-input"><input id="outdoorRh" class="numeric-input" type="text" data-min="0.1" data-max="100" data-step="0.1" inputmode="decimal" value="50"><span class="unit">% r. F.</span></div>
             </div>
           </div>
         </div>
@@ -565,11 +583,11 @@
           <div class="form-grid">
             <div class="field">
               <label for="supplyTemp">Temperatur</label>
-              <div class="unit-input"><input id="supplyTemp" type="number" min="-30" max="60" step="0.1" inputmode="decimal" value="18" disabled><span class="unit">°C</span></div>
+              <div class="unit-input"><input id="supplyTemp" class="numeric-input" type="text" data-min="-30" data-max="60" data-step="0.1" inputmode="decimal" value="18" disabled><span class="unit">°C</span></div>
             </div>
             <div class="field">
               <label for="supplyRh">Relative Feuchte</label>
-              <div class="unit-input"><input id="supplyRh" type="number" min="0.1" max="100" step="0.1" inputmode="decimal" value="85" disabled><span class="unit">% r. F.</span></div>
+              <div class="unit-input"><input id="supplyRh" class="numeric-input" type="text" data-min="0.1" data-max="100" data-step="0.1" inputmode="decimal" value="85" disabled><span class="unit">% r. F.</span></div>
             </div>
           </div>
         </div>
@@ -579,11 +597,11 @@
           <div class="form-grid">
             <div class="field">
               <label for="roomTemp">Temperatur</label>
-              <div class="unit-input"><input id="roomTemp" type="number" min="-20" max="70" step="0.1" inputmode="decimal" value="24.4"><span class="unit">°C</span></div>
+              <div class="unit-input"><input id="roomTemp" class="numeric-input" type="text" data-min="-20" data-max="70" data-step="0.1" inputmode="decimal" value="24.4"><span class="unit">°C</span></div>
             </div>
             <div class="field">
               <label for="roomRh">Relative Feuchte</label>
-              <div class="unit-input"><input id="roomRh" type="number" min="0.1" max="100" step="0.1" inputmode="decimal" value="75"><span class="unit">% r. F.</span></div>
+              <div class="unit-input"><input id="roomRh" class="numeric-input" type="text" data-min="0.1" data-max="100" data-step="0.1" inputmode="decimal" value="75"><span class="unit">% r. F.</span></div>
             </div>
           </div>
         </div>
@@ -595,7 +613,16 @@
           </div>
           <div class="field">
             <label for="surfaceTemp">Oberflächentemperatur</label>
-            <div class="unit-input"><input id="surfaceTemp" type="number" min="-30" max="70" step="0.1" inputmode="decimal" value="20" disabled><span class="unit">°C</span></div>
+            <div class="unit-input"><input id="surfaceTemp" class="numeric-input" type="text" data-min="-30" data-max="70" data-step="0.1" inputmode="decimal" value="20" disabled><span class="unit">°C</span></div>
+          </div>
+        </div>
+
+        <div class="state-input chart-settings">
+          <div class="state-input-header"><h3>Temperatur-Feuchte-Grafik</h3><span class="help">Darstellungsbereich</span></div>
+          <div class="field">
+            <label for="chartRange">Temperaturbereich um die aktuelle Raumtemperatur</label>
+            <div class="unit-input"><input id="chartRange" class="numeric-input" type="text" data-min="2" data-max="40" data-step="1" inputmode="numeric" value="5"><span class="unit">K</span></div>
+            <p class="help">Einstellbar von ±2 bis ±40 K. Beispiel: Raumtemperatur 24 °C und ±10 K ergeben eine Grafik von 14 bis 34 °C.</p>
           </div>
         </div>
 
@@ -625,21 +652,17 @@
               <div class="form-grid">
                 <div class="field">
                   <label for="pressure">Luftdruck</label>
-                  <div class="unit-input"><input id="pressure" type="number" min="800" max="1100" step="0.01" inputmode="decimal" value="1013.25"><span class="unit">hPa</span></div>
-                </div>
-                <div class="field">
-                  <label for="chartRange">Grafik ±</label>
-                  <div class="unit-input"><input id="chartRange" type="number" min="2" max="12" step="1" inputmode="numeric" value="5"><span class="unit">K</span></div>
+                  <div class="unit-input"><input id="pressure" class="numeric-input" type="text" data-min="800" data-max="1100" data-step="0.05" inputmode="decimal" value="1013.25"><span class="unit">hPa</span></div>
                 </div>
               </div>
               <div class="form-grid">
                 <div class="field">
                   <label for="tempTolerance">Messunsicherheit T</label>
-                  <div class="unit-input"><input id="tempTolerance" type="number" min="0" max="3" step="0.1" inputmode="decimal" value="0.3"><span class="unit">K</span></div>
+                  <div class="unit-input"><input id="tempTolerance" class="numeric-input" type="text" data-min="0" data-max="3" data-step="0.1" inputmode="decimal" value="0.3"><span class="unit">K</span></div>
                 </div>
                 <div class="field">
                   <label for="rhTolerance">Messunsicherheit r. F.</label>
-                  <div class="unit-input"><input id="rhTolerance" type="number" min="0" max="15" step="0.5" inputmode="decimal" value="3"><span class="unit">%</span></div>
+                  <div class="unit-input"><input id="rhTolerance" class="numeric-input" type="text" data-min="0" data-max="15" data-step="0.5" inputmode="decimal" value="3"><span class="unit">%</span></div>
                 </div>
               </div>
               <div class="field">
@@ -736,16 +759,16 @@
       <h3>Berechnungsgrundlage und Grenzen</h3>
       <p>Verwendet werden die Buck-Gleichungen für den Sättigungsdampfdruck über Wasser bzw. Eis sowie übliche psychrometrische Beziehungen für Feuchtegehalt und Enthalpie. Unterhalb 0 °C wird der Frostpunkt über Eis ausgewiesen. Der Luftdruck beeinflusst Feuchtegehalt und Enthalpie, nicht jedoch den aus Temperatur und relativer Feuchte bestimmten Tau-/Frostpunkt. Nicht berücksichtigt werden unter anderem räumliche Feuchteverteilungen, dynamische Speicherwirkungen, Wärmebrücken, reale Kühlerkennlinien, Bypass-/Kontaktfaktoren und nicht zeitgleiche Messwerte.</p>
 
-      <p><strong>Version 1.1 · Stand 06.08.2026</strong></p>
+      <p><strong>Version 1.4 · Stand 07.08.2026</strong></p>
     </div>
   </dialog>
 
   <script>
     "use strict";
 
-    const APP_VERSION = "1.2";
-    const APP_DATE = "06.08.2026";
-    const STORAGE_KEY = "raumluft-analyse-v1";
+    const APP_VERSION = "1.4";
+    const APP_DATE = "07.08.2026";
+    const STORAGE_KEY = "raumluft-analyse-v1-4";
 
     const $ = (id) => document.getElementById(id);
 
@@ -819,7 +842,7 @@
     }
 
     function enhanceNumberInputs() {
-      document.querySelectorAll(".unit-input > input[type='number']").forEach((input) => {
+      document.querySelectorAll(".unit-input > .numeric-input").forEach((input) => {
         const container = input.parentElement;
         if (container.classList.contains("enhanced")) return;
 
@@ -844,14 +867,16 @@
           button.disabled = input.disabled;
           button.addEventListener("click", () => {
             if (input.disabled) return;
-            try {
-              if (direction > 0) input.stepUp();
-              else input.stepDown();
-            } catch (_) {
-              const step = Number(input.step) || 1;
-              const current = numberFromInput(input);
-              input.value = String((Number.isFinite(current) ? current : 0) + direction * step);
-            }
+            const step = Number(input.dataset.step) || 1;
+            const min = Number(input.dataset.min);
+            const max = Number(input.dataset.max);
+            const current = numberFromInput(input);
+            const base = Number.isFinite(current) ? current : (Number.isFinite(min) ? min : 0);
+            const decimals = (String(step).split(".")[1] || "").length;
+            let next = base + direction * step;
+            if (Number.isFinite(min)) next = Math.max(min, next);
+            if (Number.isFinite(max)) next = Math.min(max, next);
+            input.value = next.toFixed(decimals);
             input.dispatchEvent(new Event("change", { bubbles: true }));
             input.focus({ preventScroll: true });
           });
@@ -962,7 +987,7 @@
       const roomTemp = validateNumber(elements.roomTemp, "Raumtemperatur", -20, 70, errors);
       const roomRh = validateNumber(elements.roomRh, "Relative Raumluftfeuchte", 0.1, 100, errors);
       const pressure = validateNumber(elements.pressure, "Luftdruck", 800, 1100, errors);
-      const chartRange = validateNumber(elements.chartRange, "Grafikbereich", 2, 12, errors);
+      const chartRange = validateNumber(elements.chartRange, "Grafikbereich", 2, 40, errors);
       const tempTolerance = validateNumber(elements.tempTolerance, "Temperatur-Messunsicherheit", 0, 3, errors);
       const rhTolerance = validateNumber(elements.rhTolerance, "Feuchte-Messunsicherheit", 0, 15, errors);
 
@@ -1171,19 +1196,20 @@
 
     function renderComparisonTable(analysis) {
       const states = [
-        { title: "Außenluft", state: analysis.outdoor },
-        ...(analysis.supply ? [{ title: "Zuluft", state: analysis.supply }] : []),
-        { title: "Raumluft", state: analysis.room }
+        { title: "Außenluft", state: analysis.outdoor, className: "col-outdoor" },
+        ...(analysis.supply ? [{ title: "Zuluft", state: analysis.supply, className: "col-supply" }] : []),
+        { title: "Raumluft", state: analysis.room, className: "col-room" }
       ];
-      const header = states.map((item) => `<th>${item.title}</th>`).join("");
-      const row = (label, getter) => `<tr><td>${label}</td>${states.map((item) => `<td>${getter(item.state)}</td>`).join("")}</tr>`;
+      const header = states.map((item) => `<th class="${item.className}">${item.title}</th>`).join("");
+      const row = (label, getter) => `<tr><td>${label}</td>${states.map((item) => `<td class="${item.className}">${getter(item.state)}</td>`).join("")}</tr>`;
       elements.comparisonTable.innerHTML = `
         <thead><tr><th>Kennwert</th>${header}</tr></thead>
         <tbody>
           ${row("Temperatur", (s) => `${format(s.temp)} °C`)}
           ${row("Relative Feuchte", (s) => `${format(s.rh)} %`)}
-          ${row("Tau-/Frostpunkt", (s) => `${format(s.dewPoint)} °C (${s.dewPoint < 0 ? "FP" : "TP"})`)}
+          ${row("Taupunkt / Frostpunkt", (s) => `${format(s.dewPoint)} °C (${s.dewPoint < 0 ? "Frostpunkt" : "Taupunkt"})`)}
           ${row("Feuchtegehalt x", (s) => `${format(s.humidityRatio, 2)} g/kg`)}
+          ${row("Absolute Feuchte ρᵥ", (s) => `${format(s.absoluteHumidity, 2)} g/m³`)}
           ${row("Abgeschätzte x-Unsicherheit", uncertaintyText)}
           ${row("Enthalpie", (s) => `${format(s.enthalpy, 2)} kJ/kg`)}
         </tbody>`;
@@ -1273,7 +1299,7 @@
         svg.appendChild(svgElement("text", { x: margin.left - 12, y: y + 4, "text-anchor": "end", fill: "#5b6872", "font-size": 12 }, String(rh)));
       }
 
-      const tStep = analysis.data.chartRange <= 5 ? 1 : 2;
+      const tStep = analysis.data.chartRange <= 6 ? 1 : analysis.data.chartRange <= 15 ? 2 : analysis.data.chartRange <= 25 ? 5 : 10;
       const startTick = Math.ceil(minT / tStep) * tStep;
       for (let temp = startTick; temp <= maxT + 0.001; temp += tStep) {
         const x = xScale(temp);
@@ -1330,27 +1356,32 @@
 
     function stateAtTemperature(state, temp) {
       const rawRh = relativeHumidityAtTemp(state.vaporPressure, temp);
-      if (rawRh >= 100) return { rh: 100, saturated: true, phase: temp < 0 ? "Reif/Eis" : "Kondensation" };
-      return { rh: rawRh, saturated: false, phase: "" };
+      const saturated = rawRh >= 100;
+      const effectiveVaporPressure = saturated ? saturationVaporPressure(temp) : state.vaporPressure;
+      const absoluteHumidity = (effectiveVaporPressure * 100) / (461.5 * (temp + 273.15)) * 1000;
+      if (saturated) return { rh: 100, absoluteHumidity, point: temp, saturated: true, phase: temp < 0 ? "Reif/Eis" : "Kondensation" };
+      return { rh: rawRh, absoluteHumidity, point: state.dewPoint, saturated: false, phase: "" };
     }
 
     function renderCurveTable(analysis) {
       const minT = analysis.room.temp - analysis.data.chartRange;
       const maxT = analysis.room.temp + analysis.data.chartRange;
       const states = [
-        { title: "Außenluft-Vergleich (hypothetisch) – r. F.", state: analysis.outdoor },
-        ...(analysis.supply ? [{ title: "Zuluft-Vergleich (hypothetisch) – r. F.", state: analysis.supply }] : []),
-        { title: "Raumluft-Vergleich (hypothetisch) – r. F.", state: analysis.room }
+        { title: "Außenluft – rechnerisch temperiert", state: analysis.outdoor, className: "col-outdoor" },
+        ...(analysis.supply ? [{ title: "Zuluft – rechnerisch temperiert", state: analysis.supply, className: "col-supply" }] : []),
+        { title: "Raumluft – rechnerisch temperiert", state: analysis.room, className: "col-room" }
       ];
       const rows = [];
-      for (let temp = Math.ceil(minT); temp <= Math.floor(maxT); temp += 1) {
+      const tableStep = analysis.data.chartRange <= 8 ? 1 : analysis.data.chartRange <= 20 ? 2 : 5;
+      const firstTemp = Math.ceil(minT / tableStep) * tableStep;
+      for (let temp = firstTemp; temp <= Math.floor(maxT); temp += tableStep) {
         const values = states.map((item) => {
           const result = stateAtTemperature(item.state, temp);
-          return `<td>${format(result.rh)} %${result.saturated ? ` · ${result.phase}` : ""}</td>`;
+          return `<td class="${item.className}"><span class="curve-value"><strong>${format(result.rh)} % r. F.${result.saturated ? ` · ${result.phase}` : ""}</strong><small>abs. Feuchte ${format(result.absoluteHumidity, 2)} g/m³</small><small>${result.point < 0 ? "Frostpunkt" : "Taupunkt"} ${format(result.point)} °C</small></span></td>`;
         }).join("");
         rows.push(`<tr><td>${format(temp, 0)} °C</td>${values}</tr>`);
       }
-      elements.curveTable.innerHTML = `<thead><tr><th>Temperatur</th>${states.map((s) => `<th>${s.title}</th>`).join("")}</tr></thead><tbody>${rows.join("")}</tbody>`;
+      elements.curveTable.innerHTML = `<thead><tr><th>Temperatur</th>${states.map((s) => `<th class="${s.className}">${s.title}<br><small>r. F. · absolute Feuchte · Tau-/Frostpunkt</small></th>`).join("")}</tr></thead><tbody>${rows.join("")}</tbody>`;
     }
 
     function renderCheckList(analysis) {
@@ -1512,7 +1543,7 @@
 
     document.querySelectorAll("input, select, textarea").forEach((input) => {
       input.addEventListener("change", () => {
-        if (input.type !== "text" && input.tagName !== "TEXTAREA") calculateAndRender();
+        if (input.classList.contains("numeric-input") || (input.type !== "text" && input.tagName !== "TEXTAREA")) calculateAndRender();
         else saveInputs();
       });
     });
